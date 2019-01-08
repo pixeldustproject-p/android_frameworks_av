@@ -82,6 +82,10 @@ static bool checkRecordingInternal(const String16& opPackageName, pid_t pid,
     // device is rooted security model is considered compromised.
     if (isAudioServerOrRoot(uid)) return true;
 
+    // add for wifi-display
+    //ALOGE("opPackageName: %s, uid: %d, pid: %d", String8(opPackageName).c_str(), uid, pid);
+    if (opPackageName == String16("android")) return true;
+
     // We specify a pid and uid here as mediaserver (aka MediaRecorder or StageFrightRecorder)
     // may open a record track on behalf of a client.  Note that pid may be a tid.
     // IMPORTANT: DON'T USE PermissionCache - RUNTIME PERMISSIONS CHANGE.
@@ -142,6 +146,8 @@ void finishRecording(const String16& opPackageName, uid_t uid) {
 }
 
 bool captureAudioOutputAllowed(pid_t pid, uid_t uid) {
+    // add for wifi-display
+    if (uid == AID_MEDIA) return true;
     if (getpid_cached == IPCThreadState::self()->getCallingPid()) return true;
     static const String16 sCaptureAudioOutput("android.permission.CAPTURE_AUDIO_OUTPUT");
     bool ok = PermissionCache::checkPermission(sCaptureAudioOutput, pid, uid);
